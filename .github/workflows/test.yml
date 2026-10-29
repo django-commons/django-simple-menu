@@ -3,12 +3,13 @@ name: Test
 on:
   push:
     branches: [master]
-    tags: ["*"]
   pull_request:
-    branches: [master]
+  workflow_dispatch:
 
 env:
   FORCE_COLOR: "1"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  PIP_NO_PYTHON_VERSION_WARNING: "1"
 
 permissions: {}
 
