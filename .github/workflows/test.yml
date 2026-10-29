@@ -78,9 +78,3 @@ jobs:
         tox -v
       env:
         DJANGO: ${{ matrix.django-version }}
-
-    # FIXME: Codecov requires a token, which we do not have
-    # - name: Upload coverage
-    #   uses: codecov/codecov-action@v5
-    #   with:
-    #     name: Python ${{ matrix.python-version }}
