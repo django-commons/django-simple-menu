@@ -224,11 +224,12 @@ class MenuItem:
             child.parent = self
             child.process(request)
 
-        self.children = [
-            child
-            for child in children
-            if child.visible
-        ]
+        if getattr(settings, 'MENU_TRIM_NON_VISIBLE_CHILD_ITEMS', True):
+            self.children = [
+                child
+                for child in children
+                if child.visible
+            ]
         self.children.sort(key=lambda child: child.weight)
 
         # if we have no children and MENU_HIDE_EMPTY then we are not visible and should return

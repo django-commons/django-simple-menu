@@ -4,7 +4,7 @@ from queue import Queue
 
 from django.conf import settings
 from django.template import Template, Context
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
 
 from simple_menu import Menu, MenuItem
@@ -264,3 +264,36 @@ class MenuItemTests(TestCase):
         self.assertTrue(item.arbitrary)
         self.assertEqual(item.dictionary, {'a': 1})
         self.assertRaises(AttributeError, lambda: item.nope)
+
+    @override_settings(MENU_TRIM_NON_VISIBLE_CHILD_ITEMS=False)
+    def test_trim_non_visible_child_items__disabled(self):
+        """
+        Ensure that non-visible child items are NOT trimmed from the menu
+        """
+        # Generate the menu
+        child_item = MenuItem("child", "/child", visible=False)
+        item = MenuItem("test", "/test", children=[child_item])
+
+        # Process the item
+        request = RequestFactory().get('/test')
+        item.process(request)
+
+        # Check that non-visible child items are still in the menu
+        self.assertIn(child_item, item.children)
+
+    def test_trim_non_visible_child_items__enabled(self):
+        """
+        Ensure that non-visible child items are trimmed from the menu.
+
+        This is the default behaviour
+        """
+        # Generate the menu
+        child_item = MenuItem("child", "/child", visible=False)
+        item = MenuItem("test", "/test", children=[child_item])
+
+        # Process the item
+        request = RequestFactory().get('/test')
+        item.process(request)
+
+        # Check that non-visible child items removed still in the menu
+        self.assertNotIn(child_item, item.children)
