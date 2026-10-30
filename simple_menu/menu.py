@@ -5,6 +5,8 @@ from django.apps import apps
 from django.conf import settings
 from django.utils.text import slugify
 
+from urllib.parse import unquote_plus
+
 
 class Menu:
     """
@@ -257,6 +259,6 @@ class MenuItem:
         if self.exact_url:
             if re.match(f"{self.url}$", request.path):
                 matched = True
-        elif re.match("%s" % self.url, request.path):
+        elif re.match("%s" % unquote_plus(self.url), request.path):
             matched = True
         return matched
