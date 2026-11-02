@@ -1,5 +1,6 @@
 import copy
 import re
+from urllib.parse import urlparse
 
 from django.apps import apps
 from django.conf import settings
@@ -253,10 +254,22 @@ class MenuItem:
         """
         match url determines if this is selected
         """
-        matched = False
+        url = self.url(request) if callable(self.url) else self.url
+        if not url or url == '#':
+            return False
+
+        parsed = urlparse(url)
+        if parsed.netloc:
+            return False
+
+        path = parsed.path or url
+
         if self.exact_url:
-            if re.match(f"{self.url}$", request.path):
-                matched = True
-        elif re.match("%s" % self.url, request.path):
-            matched = True
-        return matched
+            return request.path == path
+
+        if path == "/":
+            return request.path == "/"
+
+        url_prefix = path.rstrip('/')
+        pattern = f"^{re.escape(url_prefix)}(/.*)?$"
+        return bool(re.match(pattern, request.path))
