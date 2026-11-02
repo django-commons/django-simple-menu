@@ -42,7 +42,7 @@ jobs:
           path: dist/
 
   publish:
-    name: Publish to PyPI
+    name: Publish to TestPyPI
     needs: build
     runs-on: ubuntu-latest
 
