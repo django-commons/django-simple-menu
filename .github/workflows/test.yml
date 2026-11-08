@@ -3,12 +3,13 @@ name: Test
 on:
   push:
     branches: [master]
-    tags: ["*"]
   pull_request:
-    branches: [master]
+  workflow_dispatch:
 
 env:
   FORCE_COLOR: "1"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  PIP_NO_PYTHON_VERSION_WARNING: "1"
 
 permissions: {}
 
@@ -57,12 +58,12 @@ jobs:
           #   python-version: '3.12'
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         persist-credentials: false
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
       with:
         python-version: ${{ matrix.python-version }}
         allow-prereleases: true
@@ -78,9 +79,3 @@ jobs:
         tox -v
       env:
         DJANGO: ${{ matrix.django-version }}
-
-    # FIXME: Codecov requires a token, which we do not have
-    # - name: Upload coverage
-    #   uses: codecov/codecov-action@v5
-    #   with:
-    #     name: Python ${{ matrix.python-version }}
