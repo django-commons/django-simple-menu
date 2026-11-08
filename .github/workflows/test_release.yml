@@ -11,6 +11,9 @@ permissions: {}
 jobs:
   build-and-publish:
     uses: $/.github/workflows/build-and-publish.yml
+    permissions:
+      contents: read
+      id-token: write
     with:
       repository-url: https://test.pypi.org/legacy/
       environment-name: TestPyPI
