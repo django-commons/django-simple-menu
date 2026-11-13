@@ -234,6 +234,37 @@ class MenuTests(TestCase):
 
         self.assertEqual(out, "Parent 2,kids2-2,kids2-1,Parent 3,kids3-1,kids3-1-1,kids3-2,Parent 1,")
 
+    def test_select_parents_isolated_branches(self):
+        """
+        MENU_SELECT_PARENTS should not falsely activate other branches (e.g. root '/' or prefix matches)
+        """
+        Menu.items = {}
+        Menu.sorted = {}
+        Menu.loaded = False
+
+        Menu.add_item("nav", MenuItem("Home", "/", children=[MenuItem("Overview", "/")]))
+        Menu.add_item("nav", MenuItem("News", "/news", children=[MenuItem("Sports", "/news/sports")]))
+        Menu.add_item("nav", MenuItem("Parent", "/parent", children=[MenuItem("Child", "/parent")]))
+        Menu.add_item("nav", MenuItem("Parent Extra", "/parent-extra", children=[MenuItem("Sub", "/parent-extra/sub")]))
+
+        settings.MENU_SELECT_PARENTS = True
+
+        # When visiting /news/sports, Home branch should not be selected
+        request = self.factory.get('/news/sports')
+        items = Menu.process(request, 'nav')
+        self.assertFalse(items[0].selected)
+        self.assertFalse(items[0].children[0].selected)
+        self.assertTrue(items[1].selected)
+        self.assertTrue(items[1].children[0].selected)
+
+        # When visiting /parent-extra/sub, Parent (/parent) should not be selected
+        request = self.factory.get('/parent-extra/sub')
+        items = Menu.process(request, 'nav')
+        self.assertFalse(items[2].selected)
+        self.assertFalse(items[2].children[0].selected)
+        self.assertTrue(items[3].selected)
+        self.assertTrue(items[3].children[0].selected)
+
     def test_template_tag_missing_attribute(self):
         """
         Missing attributes should not raise exceptions in templates
@@ -264,3 +295,53 @@ class MenuItemTests(TestCase):
         self.assertTrue(item.arbitrary)
         self.assertEqual(item.dictionary, {'a': 1})
         self.assertRaises(AttributeError, lambda: item.nope)
+
+    def test_match_url_root(self):
+        """
+        Root URL / should only match the root path /
+        """
+        factory = RequestFactory()
+        item = MenuItem("home", "/")
+
+        self.assertTrue(item.match_url(factory.get("/")))
+        self.assertFalse(item.match_url(factory.get("/other")))
+        self.assertFalse(item.match_url(factory.get("/other/sub")))
+
+    def test_match_url_path_boundaries(self):
+        """
+        Prefix matching should respect path boundaries
+        """
+        factory = RequestFactory()
+        item = MenuItem("parent", "/parent")
+
+        self.assertTrue(item.match_url(factory.get("/parent")))
+        self.assertTrue(item.match_url(factory.get("/parent/")))
+        self.assertTrue(item.match_url(factory.get("/parent/child")))
+        self.assertFalse(item.match_url(factory.get("/parent2")))
+        self.assertFalse(item.match_url(factory.get("/parent-extra")))
+
+    def test_match_url_special_characters(self):
+        """
+        URLs with regex metacharacters should match literally without error
+        """
+        factory = RequestFactory()
+        item_dot = MenuItem("doc", "/page.html")
+        self.assertTrue(item_dot.match_url(factory.get("/page.html")))
+        self.assertFalse(item_dot.match_url(factory.get("/pageXhtml")))
+
+        item_plus = MenuItem("plus", "/c++")
+        self.assertTrue(item_plus.match_url(factory.get("/c++")))
+        self.assertTrue(item_plus.match_url(factory.get("/c++/stl")))
+        self.assertFalse(item_plus.match_url(factory.get("/c")))
+
+    def test_match_url_empty_and_external(self):
+        """
+        Empty, anchor-only, or external URLs should never match request paths
+        """
+        factory = RequestFactory()
+        req = factory.get("/docs")
+
+        self.assertFalse(MenuItem("empty", "").match_url(req))
+        self.assertFalse(MenuItem("none", None).match_url(req))
+        self.assertFalse(MenuItem("hash", "#").match_url(req))
+        self.assertFalse(MenuItem("external", "https://example.com/docs").match_url(req))
