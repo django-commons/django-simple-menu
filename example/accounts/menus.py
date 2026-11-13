@@ -19,6 +19,10 @@ submenu_items = [
              icon=f'{i}-circle')
     for i in range(1, 4)
 ]
+
+# Test sub menu with space
+submenu_items.append(MenuItem(f"Page with space", reverse('accounts:space_test')))
+
 Menu.add_item("user", MenuItem("Subpages",
                                reverse('accounts:subpage', kwargs={'i': 1}),
                                icon="menu-app",
