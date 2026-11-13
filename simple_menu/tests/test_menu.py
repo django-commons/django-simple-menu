@@ -4,7 +4,7 @@ from queue import Queue
 
 from django.conf import settings
 from django.template import Template, Context
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.test.client import RequestFactory
 
 from simple_menu import Menu, MenuItem
@@ -23,7 +23,7 @@ class CustomMenuItem(MenuItem):
         self.visible = not request.path.endswith("foo")
 
 
-class MenuTests(TestCase):
+class MenuTests(SimpleTestCase):
     """
     Tests for Menu
     """
@@ -256,7 +256,7 @@ class MenuTests(TestCase):
 
         self.assertEqual(out, "Parent 2,Parent 3,Parent 1,")
 
-class MenuItemTests(TestCase):
+class MenuItemTests(SimpleTestCase):
     """
     Tests for MenuItem
     """

@@ -2,13 +2,6 @@ import os
 
 TEST_DIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), "tests")
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": ":memory:",
-    }
-}
-
 INSTALLED_APPS = ["simple_menu"]
 
 STATIC_URL = "/static/"
