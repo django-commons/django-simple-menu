@@ -4,7 +4,9 @@ import re
 from django.apps import apps
 from django.conf import settings
 from django.utils.text import slugify
+import logging
 
+logger = logging.getLogger(__name__)
 
 class Menu:
     """
@@ -87,6 +89,8 @@ class Menu:
         process uses the current request to determine which menus
         should be visible, which are selected, etc.
         """
+
+
         # make sure we're loaded & sorted
         c.load_menus()
         c.sort_menus()
@@ -260,3 +264,6 @@ class MenuItem:
         elif re.match("%s" % self.url, request.path):
             matched = True
         return matched
+
+    def __repr__(self):
+        return f"MenuItem({self.title!r}, {self.url!r}, {self.parent=!r})"

@@ -9,6 +9,23 @@ STATIC_ROOT = os.path.join(TEST_DIR, "static")
 
 SECRET_KEY = "testing-menus-is-so-much-fun"
 
+# LOGGING = {
+#     "version": 1,  # the dictConfig format version
+#     "disable_existing_loggers": False,  # retain the default loggers
+#     "handlers": {
+#         "console": {
+#             "level": "DEBUG",
+#             "class": "logging.StreamHandler",
+#         },
+#     },
+#     "loggers": {
+#         "simple_menu": {
+#             "handlers": ["console"],
+#             "level": "DEBUG",
+#         },
+#     },
+# }
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
