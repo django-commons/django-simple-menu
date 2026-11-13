@@ -88,6 +88,11 @@ class MenuTests(TestCase):
 
         self.factory = RequestFactory()
 
+    def tearDown(self):
+        Menu.items = {}
+        Menu.sorted = {}
+        Menu.loaded = False
+
     def test_custom_menuitem(self):
         """
         Ensure our custom check on our custom MenuItem works
