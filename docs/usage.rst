@@ -125,6 +125,34 @@ You can use it like::
     {% with menu=menus.main %}{% include "bootstrap-navbar.html" %}{% endwith %}
 
 
+Internacionalization
+--------------------
+
+If your project uses ``i18n_patterns`` for handling localized URLs, you should define the ``url``
+argument in ``MenuItem`` as a callable instead of a static string. This ensures that the correct
+localized URL is resolved based on the active language.
+
+For example, consider the following implementation inside a ``utils/menus.py`` file:
+
+``utils/menus.py``::
+
+    from django.urls import reverse
+    from django.utils.translation import gettext_lazy as _
+    from simple_menu import Menu, MenuItem
+
+    Menu.add_item(
+        "main",
+        MenuItem(
+            _("Awesome App"),  # Title translated using gettext_lazy
+            lambda request: reverse("portal:index"),  # URL resolved dynamically
+            icon="fa-solid fa-circle",
+            check=lambda request: request.user.is_authenticated,
+        ),
+    )
+
+When using ``i18n_patterns``, Django assigns language-specific prefixes to URLs (e.g., ``/en/portal/index/`` for English and ``/fr/portal/index/`` for French). By defining the ``url`` as a callable (``lambda request: reverse("portal:index")``), Django ensures that it resolves the correct localized URL dynamically at runtime, rather than hardcoding it.
+
+
 Check generalizations
 ---------------------
 
