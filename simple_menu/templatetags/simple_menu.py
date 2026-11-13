@@ -29,7 +29,9 @@ class MenuNode(template.Node):
                     return r
             return None
 
+        # Making it backward compatible (these should probably be renamed selected_menuitem and selected_menu, respectively)
         selected_menu = None
+        selected_menu_menu = None
         for name in menus:
             found_menu = find_selected(menus[name])
             if found_menu:
@@ -41,6 +43,7 @@ class MenuNode(template.Node):
                         selected_menu.selected = False
 
                     selected_menu = found_menu
+                    selected_menu_menu = menus[name]
 
         # now for the submenu
         submenu = []
@@ -56,6 +59,7 @@ class MenuNode(template.Node):
         # set the items in our context
         context['menus'] = menus
         context['selected_menu'] = selected_menu
+        context['selected_menu_menu'] = selected_menu_menu
         context['submenu'] = submenu
         context['has_submenu'] = has_submenu
 
